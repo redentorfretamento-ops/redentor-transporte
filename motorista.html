@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Redentor — Rota do Dia</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1c2330;
+  --border: #2d3748;
+  --accent: #f59e0b;
+  --accent2: #3b82f6;
+  --green: #10b981;
+  --red: #ef4444;
+  --text: #e6edf3;
+  --muted: #8b949e;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* LOGIN */
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.login-logo {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 800;
+  font-size: 28px;
+  color: var(--accent);
+  margin-bottom: 4px;
+  text-align: center;
+}
+.login-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 32px;
+  text-align: center;
+}
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 360px;
+}
+.login-label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: block;
+}
+.login-input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.login-input:focus { border-color: var(--accent); }
+.login-btn {
+  width: 100%;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Barlow', sans-serif;
+  transition: opacity 0.15s;
+}
+.login-btn:active { opacity: 0.85; }
+.login-error {
+  color: var(--red);
+  font-size: 13px;
+  text-align: center;
+  margin-top: 10px;
+  display: none;
+}
+
+/* MAIN APP */
+.app { display: none; }
+.app.open { display: block; }
+
+.header {
+  background: var(--surface);
+  border-bottom: 2px solid var(--accent);
+  padding: 14px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-logo {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--accent);
+}
+.header-sub { font-size: 11px; color: var(--muted); }
+.logout-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.body { padding: 16px; max-width: 480px; margin: 0 auto; }
+
+.section-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.select-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px 14px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.select-input:focus { border-color: var(--accent); }
+
+/* START BUTTON */
+.start-btn {
+  display: flex;
+  width: 100%;
+  background: var(--green);
+  color: #000;
+  border: none;
+  border-radius: 14px;
+  padding: 18px;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: 'Barlow', sans-serif;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.start-btn:active { opacity: 0.85; }
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+/* Motorista card */
+.moto-name {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+}
+.moto-tel { font-size: 13px; color: var(--accent2); margin-top: 4px; }
+
+/* Stop list */
+.stop {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+.stop:last-child { border-bottom: none; }
+.stop-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #000;
+  font-weight: 800;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'Barlow', sans-serif;
+}
+.stop-time {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--accent);
+  min-width: 52px;
+  line-height: 1;
+  padding-top: 4px;
+}
+.stop-info { flex: 1; min-width: 0; }
+.stop-name {
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stop-addr {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+.stop-tel { font-size: 12px; color: var(--accent2); margin-top: 3px; }
+.nav-btn {
+  display: block;
+  background: var(--surface2);
+  border: 1px solid var(--accent2);
+  color: var(--accent2);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  margin-top: 8px;
+  font-family: 'DM Sans', sans-serif;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.nav-btn:active { background: rgba(59,130,246,0.15); }
+
+/* Destination */
+.dest-card {
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.dest-time {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 800;
+  font-size: 36px;
+  color: var(--accent2);
+}
+.dest-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.dest-addr { font-size: 13px; color: var(--text); margin-top: 6px; }
+
+/* Garagem card */
+.garagem-card {
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+/* No data */
+.no-data {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+.no-data-icon { font-size: 48px; margin-bottom: 12px; }
+.no-data-title { font-family:'Barlow',sans-serif; font-weight:700; font-size:18px; color:var(--text); margin-bottom:8px; }
+
+/* Summary chips */
+.chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.chip {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid;
+}
+.chip-turno { border-color:var(--accent); color:var(--accent); background:rgba(245,158,11,0.08); }
+.chip-pass { border-color:var(--green); color:var(--green); background:rgba(16,185,129,0.08); }
+.chip-vei { border-color:var(--accent2); color:var(--accent2); background:rgba(59,130,246,0.08); }
+
+  /* Navigation buttons */
+  .nav-btns-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .nav-maps-btn {
+    display: flex;
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 15px 10px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Barlow', sans-serif;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .nav-waze-btn {
+    display: flex;
+    background: #33CCFF;
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 15px 10px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Barlow', sans-serif;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .nav-maps-btn:active, .nav-waze-btn:active { opacity: 0.8; }
+  .stop-nav-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .stop-nav-maps {
+    display: block;
+    background: var(--surface2);
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+    border-radius: 8px;
+    padding: 7px 8px;
+    font-size: 11px;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .stop-nav-waze {
+    display: block;
+    background: var(--surface2);
+    border: 1px solid #33CCFF;
+    color: #33CCFF;
+    border-radius: 8px;
+    padding: 7px 8px;
+    font-size: 11px;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .stop-nav-maps:active { background: rgba(59,130,246,0.15); }
+  .stop-nav-waze:active { background: rgba(51,204,255,0.15); }
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-logo">🚐 REDENTOR</div>
+  <div class="login-sub">Fretamento e Turismo — Área do Motorista</div>
+  <div class="login-card">
+    <label class="login-label">Senha de acesso</label>
+    <input class="login-input" type="password" id="senhaInput" placeholder="Digite a senha"
+      onkeydown="if(event.key==='Enter') fazerLogin()">
+    <button class="login-btn" onclick="fazerLogin()">🔓 Entrar</button>
+    <div class="login-error" id="loginError">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="appMain">
+  <div class="header">
+    <div>
+      <div class="header-logo">🚐 REDENTOR</div>
+      <div class="header-sub">Rota do Dia</div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Sair</button>
+  </div>
+
+  <div class="body">
+    <div style="margin-bottom:8px">
+      <label class="section-label">Selecione seu nome</label>
+      <select class="select-input" id="selMotorista" onchange="loadLinhas()">
+        <option value="">— Selecione o motorista —</option>
+      </select>
+    </div>
+    <div id="linhaSection" style="display:none">
+      <label class="section-label">Selecione a linha e turno</label>
+      <select class="select-input" id="selLinha" onchange="loadRota()">
+        <option value="">— Selecione uma linha —</option>
+      </select>
+    </div>
+    <div id="rotaContent"></div>
+  </div>
+</div>
+
+<script>
+// ---- CONFIG ----
+const SENHA = 'redentor2025'; // Altere aqui para mudar a senha
+const STORAGE_KEY = 'redentor_v1';
+const CHEGADAS = { '1°': '05:45', '2°': '14:45', '3°': '20:55' };
+const GARAGEM = 'R. Sebastiana Rosa Luposeli, 59 — Júlio de Mesquita Filho, Sorocaba-SP';
+const GARAGEM_COORDS = { lat: -23.514606111185454, lng: -47.51671157145018 };
+const EMPRESA_COORDS = { lat: -23.44293641550631, lng: -47.389652010783614 };
+
+let DATA = [];
+let MOTORISTAS = [];
+
+// ---- AUTH ----
+function fazerLogin() {
+  const senha = document.getElementById('senhaInput').value;
+  if (senha === SENHA) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appMain').classList.add('open');
+    document.getElementById('loginError').style.display = 'none';
+    loadFromStorage();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('senhaInput').value = '';
+    document.getElementById('senhaInput').focus();
+  }
+}
+
+function logout() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('appMain').classList.remove('open');
+  document.getElementById('senhaInput').value = '';
+  document.getElementById('rotaContent').innerHTML = '';
+}
+
+// ---- DATA ----
+const FB_CONFIG = {
+  apiKey: "AIzaSyAuo4e7QEOR-Yqs-Im-dSkC9hOQ19pRmG4",
+  authDomain: "redentor-transporte-11808.firebaseapp.com",
+  projectId: "redentor-transporte-11808",
+  storageBucket: "redentor-transporte-11808.firebasestorage.app",
+  messagingSenderId: "212228402135",
+  appId: "1:212228402135:web:af9ae2948f0fd1864ff992"
+};
+
+async function loadFromStorage() {
+  showLoading();
+  try {
+    // Try Firebase first
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const fbApp = initializeApp(FB_CONFIG);
+    const fbDb = getFirestore(fbApp);
+    const snap = await getDoc(doc(fbDb, 'redentor', 'dados'));
+
+    if (snap.exists()) {
+      const data = snap.data();
+      DATA = data.DATA || [];
+      MOTORISTAS = data.MOTORISTAS || [];
+      // Cache locally
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+      console.log('✅ Dados carregados do Firebase');
+    } else {
+      throw new Error('Sem dados no Firebase');
+    }
+  } catch(e) {
+    console.warn('Firebase falhou, tentando localStorage:', e.message);
+    // Fallback to localStorage
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const snap = JSON.parse(raw);
+        DATA = snap.DATA || [];
+        MOTORISTAS = snap.MOTORISTAS || [];
+        console.log('✅ Dados carregados do localStorage (cache)');
+      } else {
+        showNoData('Sem conexão', 'Não foi possível carregar os dados. Verifique sua conexão e tente novamente.');
+        return;
+      }
+    } catch(e2) {
+      showNoData('Erro ao carregar dados.', 'Verifique sua conexão com a internet.');
+      return;
+    }
+  }
+
+  if (DATA.length === 0) {
+    showNoData('Sem rotas cadastradas.', 'O gestor ainda não configurou as rotas.');
+    return;
+  }
+
+  populateMotoristas();
+}
+
+function showLoading() {
+  document.getElementById('rotaContent').innerHTML =
+    '<div class="no-data"><div class="no-data-icon">⏳</div>' +
+    '<div class="no-data-title">Carregando dados...</div>' +
+    '<div style="font-size:13px;color:var(--muted)">Conectando ao servidor</div></div>';
+}
+
+function populateMotoristas() {
+  const sel = document.getElementById('selMotorista');
+  sel.innerHTML = '<option value="">— Selecione o motorista —</option>';
+  MOTORISTAS.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.nome;
+    opt.textContent = m.nome;
+    sel.appendChild(opt);
+  });
+}
+
+function loadLinhas() {
+  const nome = document.getElementById('selMotorista').value;
+  const linhaSection = document.getElementById('linhaSection');
+  const sel = document.getElementById('selLinha');
+  document.getElementById('rotaContent').innerHTML = '';
+
+  if (!nome) { linhaSection.style.display = 'none'; return; }
+
+  sel.innerHTML = '<option value="">— Selecione uma linha —</option>';
+  DATA.forEach(rota => {
+    if (rota.motorista !== nome && rota.motoristaSaida !== nome) return;
+    const ativos = rota.passageiros.filter(p => p.status === 'ativo').length;
+    if (ativos === 0) return;
+    const chegada = CHEGADAS[rota.turno] || '';
+    const opt = document.createElement('option');
+    opt.value = rota.id;
+    opt.textContent = 'Linha ' + rota.linha + ' · ' + rota.turno + ' Turno · chegada ' + chegada;
+    sel.appendChild(opt);
+  });
+
+  linhaSection.style.display = 'block';
+}
+
+function loadRota() {
+  const rotaId = document.getElementById('selLinha').value;
+  const content = document.getElementById('rotaContent');
+  if (!rotaId) { content.innerHTML = ''; return; }
+
+  const rota = DATA.find(r => r.id === rotaId);
+  if (!rota) return;
+
+  const chegada = CHEGADAS[rota.turno] || '';
+  const mObj = MOTORISTAS.find(m => m.nome === rota.motorista);
+  const mObjS = rota.motoristaSaida ? MOTORISTAS.find(m => m.nome === rota.motoristaSaida) : null;
+
+  const sorted = rota.passageiros
+    .filter(p => p.status === 'ativo')
+    .sort((a,b) => (a.horario||'99:99').localeCompare(b.horario||'99:99'));
+
+  const mapsUrl = buildMapsUrl(sorted);
+
+  let html = '';
+
+  // Summary chips
+  html += '<div class="chips">';
+  html += '<span class="chip chip-turno">⏰ ' + rota.turno + ' Turno</span>';
+  html += '<span class="chip chip-pass">👥 ' + sorted.length + ' passageiros</span>';
+  html += '<span class="chip chip-vei">🚐 ' + rota.veiculo + '</span>';
+  html += '</div>';
+
+  // Motorista card
+  if (mObj) {
+    html += '<div class="card">';
+    html += '<div class="card-title">👤 Motorista responsável</div>';
+    html += '<div class="moto-name">' + mObj.nome + '</div>';
+    if (mObj.tel) html += '<div class="moto-tel">📞 ' + mObj.tel + '</div>';
+    if (mObjS) {
+      html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">';
+      html += '<div style="font-size:11px;color:var(--muted)">🌙 Motorista de Saída: <strong style="color:var(--text)">' + mObjS.nome + '</strong>';
+      if (mObjS.tel) html += ' · <span style="color:var(--accent2)">' + mObjS.tel + '</span>';
+      html += '</div></div>';
+    }
+    html += '</div>';
+  }
+
+  // Build Waze URL (first stop from garagem)
+  const wazeFirstUrl = buildWazeRouteUrl(sorted);
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const manyStops = sorted.length > 8 && isIOS;
+
+  // Dual navigation buttons
+  html += '<div class="nav-btns-row">';
+  html += '<a href="' + mapsUrl + '" target="_blank" class="nav-maps-btn">';
+  html += '<span style="font-size:20px">🗺️</span> Google Maps';
+  html += '</a>';
+  html += '<a href="' + wazeFirstUrl + '" target="_blank" class="nav-waze-btn">';
+  html += '<span style="font-size:20px">🔵</span> Waze';
+  html += '</a>';
+  html += '</div>';
+
+  if (manyStops) {
+    html += '<div style="background:rgba(51,204,255,0.08);border:1px solid rgba(51,204,255,0.3);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#33CCFF">';
+    html += '💡 <strong>Dica para iOS:</strong> O Waze navega parada a parada automaticamente. Use o botão Waze em cada parada na lista abaixo para navegar em sequência.';
+    html += '</div>';
+  }
+
+  // Garagem
+  html += '<div class="garagem-card">';
+  html += '<div style="font-size:11px;color:var(--green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">🏭 Ponto de Partida</div>';
+  html += '<div style="font-weight:600">Garagem Redentor</div>';
+  html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + GARAGEM + '</div>';
+  html += '<div class="stop-nav-row" style="margin-top:8px">';
+  html += '<a href="https://www.google.com/maps/search/?api=1&query=' + GARAGEM_COORDS.lat + ',' + GARAGEM_COORDS.lng + '" target="_blank" class="stop-nav-maps" style="border-color:var(--green);color:var(--green)">🗺️ Google Maps</a>';
+  html += '<a href="' + buildWazeUrl(GARAGEM_COORDS.lat, GARAGEM_COORDS.lng, null, null) + '" target="_blank" class="stop-nav-waze">🔵 Waze</a>';
+  html += '</div>';
+  html += '</div>';
+
+  // Stops
+  html += '<div class="card">';
+  html += '<div class="card-title">🛑 Paradas de Embarque</div>';
+
+  sorted.forEach((p, i) => {
+    const addr = p.embarque || p.endereco || '—';
+    const coordLink = p.lat && p.lng
+      ? 'https://www.google.com/maps/search/?api=1&query=' + p.lat + ',' + p.lng
+      : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr + ', ' + (p.cidade||'Sorocaba') + ' SP');
+
+    html += '<div class="stop">';
+    html += '<div class="stop-num">' + (i+1) + '</div>';
+    html += '<div class="stop-time">' + (p.horario||'--:--') + '</div>';
+    html += '<div class="stop-info">';
+    html += '<div class="stop-name">' + p.nome + '</div>';
+    if (p.telefone) html += '<div class="stop-tel">📞 ' + p.telefone + '</div>';
+    html += '<div class="stop-addr">📍 ' + addr;
+    if (p.bairro) html += ' · ' + p.bairro;
+    html += '</div>';
+    const wazeStopUrl = buildWazeUrl(p.lat, p.lng, p.embarque || p.endereco, p.cidade);
+    html += '<div class="stop-nav-row">';
+    html += '<a href="' + coordLink + '" target="_blank" class="stop-nav-maps">🗺️ Google Maps</a>';
+    html += '<a href="' + wazeStopUrl + '" target="_blank" class="stop-nav-waze">🔵 Waze</a>';
+    html += '</div>';
+    html += '</div></div>';
+  });
+
+  html += '</div>';
+
+  // Destination
+  html += '<div class="dest-card">';
+  html += '<div style="font-size:11px;color:var(--accent2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">🏁 Destino Final</div>';
+  html += '<div class="dest-time">' + chegada + '</div>';
+  html += '<div class="dest-label">Chegada prevista na empresa</div>';
+  html += '<div class="dest-addr">Av. Jerome Case, 2600 — Éden, Sorocaba-SP</div>';
+  html += '<div class="stop-nav-row" style="margin-top:8px">';
+  html += '<a href="https://www.google.com/maps/search/?api=1&query=' + EMPRESA_COORDS.lat + ',' + EMPRESA_COORDS.lng + '" target="_blank" class="stop-nav-maps">🗺️ Google Maps</a>';
+  html += '<a href="' + buildWazeUrl(EMPRESA_COORDS.lat, EMPRESA_COORDS.lng, null, null) + '" target="_blank" class="stop-nav-waze">🔵 Waze</a>';
+  html += '</div>';
+  html += '</div>';
+
+  content.innerHTML = html;
+}
+
+function buildWazeUrl(lat, lng, addr, cidade) {
+  // Waze deep link - works on iOS and Android
+  if (lat && lng) {
+    return 'https://waze.com/ul?ll=' + lat + ',' + lng + '&navigate=yes&zoom=17';
+  }
+  const q = encodeURIComponent((addr || '') + ', ' + (cidade || 'Sorocaba') + ' SP');
+  return 'https://waze.com/ul?q=' + q + '&navigate=yes';
+}
+
+function buildWazeRouteUrl(stops) {
+  // Waze doesn't support multi-stop routes via URL
+  // Best approach: navigate to first stop, then each subsequent stop
+  // We return the URL for the first stop from garagem
+  if (stops.length === 0) {
+    return 'https://waze.com/ul?ll=-23.44293641550631,-47.389652010783614&navigate=yes';
+  }
+  const first = stops[0];
+  return buildWazeUrl(first.lat, first.lng, first.embarque || first.endereco, first.cidade);
+}
+
+function buildMapsUrl(stops) {
+  // Detect iOS/Safari
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+  const garLat = -23.514606111185454, garLng = -47.51671157145018;
+  const empLat = -23.44293641550631, empLng = -47.389652010783614;
+
+  if (stops.length === 0) {
+    if (isIOS) return 'maps://?saddr=' + garLat + ',' + garLng + '&daddr=' + empLat + ',' + empLng + '&dirflg=d';
+    return 'https://www.google.com/maps/dir/?api=1&origin=' + garLat + ',' + garLng + '&destination=' + empLat + ',' + empLng + '&travelmode=driving';
+  }
+
+  // Build stops list with coordinates when available
+  const wayCoords = stops
+    .filter(p => p.lat && p.lng)
+    .map(p => p.lat + ',' + p.lng);
+
+  const wayAddrs = stops.map(p => {
+    if (p.lat && p.lng) return p.lat + ',' + p.lng;
+    return (p.embarque || p.endereco || '') + ', ' + (p.cidade||'Sorocaba') + ' SP';
+  });
+
+  if (isIOS) {
+    // iOS Maps URL scheme - works with Apple Maps or Google Maps app
+    // For iOS, link directly to Google Maps app with comgooglemaps:// if installed
+    // Otherwise fall back to universal link
+    if (stops.length <= 8) {
+      // Use Google Maps universal link - most compatible on iOS
+      const waypointsStr = wayAddrs.slice(0, 8).map(w => encodeURIComponent(w)).join('%7C');
+      return 'https://www.google.com/maps/dir/?api=1' +
+        '&origin=' + garLat + ',' + garLng +
+        '&destination=' + empLat + ',' + empLng +
+        '&waypoints=' + waypointsStr +
+        '&travelmode=driving';
+    }
+    // For many stops on iOS: open step by step - first stop only, user navigates sequentially
+    // Show first unvisited stop
+    const first = stops[0];
+    const dest = first.lat && first.lng ? first.lat + ',' + first.lng : encodeURIComponent((first.embarque || first.endereco) + ', ' + (first.cidade||'Sorocaba') + ' SP');
+    return 'https://www.google.com/maps/dir/?api=1' +
+      '&origin=' + garLat + ',' + garLng +
+      '&destination=' + dest +
+      '&travelmode=driving';
+  }
+
+  // Android / Desktop - supports more waypoints
+  if (wayAddrs.length <= 8) {
+    const waypointsStr = wayAddrs.map(w => encodeURIComponent(w)).join('%7C');
+    return 'https://www.google.com/maps/dir/?api=1' +
+      '&origin=' + garLat + ',' + garLng +
+      '&destination=' + empLat + ',' + empLng +
+      '&waypoints=' + waypointsStr +
+      '&travelmode=driving';
+  }
+
+  // Many stops: use /dir/ path format
+  const parts = [garLat + ',' + garLng, ...wayAddrs.map(w => encodeURIComponent(w)), empLat + ',' + empLng];
+  return 'https://www.google.com/maps/dir/' + parts.join('/');
+}
+
+function showNoData(title, msg) {
+  document.getElementById('rotaContent').innerHTML =
+    '<div class="no-data">' +
+    '<div class="no-data-icon">📭</div>' +
+    '<div class="no-data-title">' + title + '</div>' +
+    '<div style="font-size:13px">' + msg + '</div>' +
+    '</div>';
+}
+
+// Check if already on same device as management system
+window.onload = function() {
+  // Focus on password field
+  setTimeout(() => {
+    const input = document.getElementById('senhaInput');
+    if (input) input.focus();
+  }, 300);
+};
+</script>
+</body>
+</html>
