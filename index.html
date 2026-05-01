@@ -747,6 +747,21 @@
     letter-spacing: 1px;
   }
 
+
+  .reorder-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 4px;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .reorder-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--accent); }
+  .reorder-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
   /* Scrollbars */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -1343,7 +1358,7 @@ function selectLine(id) {
             <th>Telefone</th>
             <th>Ponto de Embarque</th>
             <th>Status</th>
-            <th class="actions-td"></th>
+            <th style="width:70px;text-align:center">Ordem</th>
           </tr>
         </thead>
         <tbody id="passTable">
@@ -1395,6 +1410,31 @@ function renderTable(rota) {
       return function() { openEditModal(rid, ri); };
     })(rota.id, realIdx);
     tr.querySelector('.actions-td').appendChild(btn);
+
+    // Reorder cell
+    const tdReorder = document.createElement('td');
+    tdReorder.style.cssText = 'text-align:center;white-space:nowrap';
+    const btnUp = document.createElement('button');
+    btnUp.className = 'reorder-btn';
+    btnUp.textContent = '↑';
+    btnUp.title = 'Mover para cima';
+    btnUp.disabled = seqIdx === 0;
+    btnUp.onclick = (function(rid, ri) {
+      return function() { movePassageiro(rid, ri, -1); };
+    })(rota.id, realIdx);
+    const btnDown = document.createElement('button');
+    btnDown.className = 'reorder-btn';
+    btnDown.textContent = '↓';
+    btnDown.title = 'Mover para baixo';
+    btnDown.disabled = seqIdx === sorted.length - 1;
+    btnDown.onclick = (function(rid, ri) {
+      return function() { movePassageiro(rid, ri, 1); };
+    })(rota.id, realIdx);
+    tdReorder.appendChild(btnUp);
+    tdReorder.appendChild(document.createTextNode(' '));
+    tdReorder.appendChild(btnDown);
+    tr.appendChild(tdReorder);
+
     tbody.appendChild(tr);
   });
 }
@@ -2652,6 +2692,34 @@ function aplicarOtimizacao() {
   document.getElementById('modalOtimizar').classList.remove('open');
   selectLine(pendingOptimization.rotaId);
   pendingOptimization = null;
+}
+
+
+function movePassageiro(rotaId, realIdx, direction) {
+  const rota = DATA.find(r => r.id === rotaId);
+  const pass = rota.passageiros;
+  
+  // Find current sorted position of this passenger
+  const sorted = [...pass].sort((a, b) => {
+    const ta = a.horario && a.horario !== '--:--' ? a.horario : '99:99';
+    const tb = b.horario && b.horario !== '--:--' ? b.horario : '99:99';
+    return ta.localeCompare(tb);
+  });
+  
+  const p = pass[realIdx];
+  const sortedIdx = sorted.indexOf(p);
+  const targetSortedIdx = sortedIdx + direction;
+  
+  if (targetSortedIdx < 0 || targetSortedIdx >= sorted.length) return;
+  
+  // Swap horarios between the two passengers to change order
+  const pTarget = sorted[targetSortedIdx];
+  const tempHorario = p.horario;
+  p.horario = pTarget.horario;
+  pTarget.horario = tempHorario;
+  
+  saveAfterChange();
+  selectLine(rotaId);
 }
 
 // ---- INIT ----
