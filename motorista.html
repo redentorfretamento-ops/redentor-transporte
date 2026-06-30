@@ -716,7 +716,7 @@ function _fmtDiaChat(m){ try{ var d = new Date(m.em); var hoje=new Date(); var y
 function _sepDataChat(m, anterior){ var dAtual=_diaChat(m); if(!dAtual) return ''; var dAnt = anterior ? _diaChat(anterior) : ''; if(dAtual===dAnt) return ''; var lbl=_fmtDiaChat(m); if(!lbl) return ''; return '<div style="align-self:center;margin:8px auto;padding:3px 12px;background:rgba(128,128,128,0.18);border-radius:12px;font-size:11px;font-weight:600;color:var(--muted);text-align:center">'+lbl+'</div>'; }
 
 // ---- ABAS ----
-const BUSCA_KEY = 'redentor_busca_sessao';
+const BUSCA_KEY = 'evamo_busca_sessao';
 
 function salvarBuscaSessao() {
   try {
@@ -1082,7 +1082,7 @@ function limparBuscaSelecionados() {
 
 // ---- CONFIG ----
 const SENHA = 'redentor2025'; // Altere aqui para mudar a senha
-const STORAGE_KEY = 'redentor_v1';
+const STORAGE_KEY = 'evamo_v1';
 const CHEGADAS = { '1°': '05:45', '2°': '14:45', '3°': '20:55' };
 const GARAGEM = 'R. Sebastiana Rosa Luposeli, 59 — Júlio de Mesquita Filho, Sorocaba-SP';
 const GARAGEM_COORDS = { lat: -23.514606111185454, lng: -47.51671157145018 };
@@ -1129,7 +1129,7 @@ let MOTORISTAS = [
 ];
 
 // ---- AUTH / SESSÃO ----
-const SESSION_KEY = 'redentor_sessao';
+const SESSION_KEY = 'evamo_sessao';
 
 function salvarSessao(motorista, linhaId) {
   try { localStorage.setItem(SESSION_KEY, JSON.stringify({ motorista, linhaId })); } catch(e) {}
@@ -1153,22 +1153,17 @@ function logout() { resetSelecao(); }
 
 // ---- DATA ----
 const FB_CONFIG = {
-  apiKey: "AIzaSyAuo4e7QEOR-Yqs-Im-dSkC9hOQ19pRmG4",
-  authDomain: "redentor-transporte-11808.firebaseapp.com",
-  projectId: "redentor-transporte-11808",
-  storageBucket: "redentor-transporte-11808.firebasestorage.app",
-  messagingSenderId: "212228402135",
-  appId: "1:212228402135:web:af9ae2948f0fd1864ff992"
+  apiKey: "AIzaSyBN1VE2mS5nn5LxfxWMqJyHSe1aDtwYiCE",
+  authDomain: "evamo-transporte.firebaseapp.com",
+  projectId: "evamo-transporte",
+  storageBucket: "evamo-transporte.firebasestorage.app",
+  messagingSenderId: "84008575783",
+  appId: "1:84008575783:web:d56e4e2cdeed1438b87f02"
 };
 
-// ============================================================
 // TRAVA DE IDENTIDADE (proteção multi-cliente)
-// CLIENTE_ID = nome da coleção própria deste cliente no Firestore.
-// PROJETO_ESPERADO = projectId do Firebase que ESTE arquivo deve usar.
-// Se aberto no banco errado, bloqueia gravação e avisa.
-// ============================================================
-const CLIENTE_ID = 'redentor';
-const PROJETO_ESPERADO = 'redentor-transporte-11808';
+const CLIENTE_ID = 'evamo';
+const PROJETO_ESPERADO = 'evamo-transporte';
 let TRAVA_OK = true;
 function verificarIdentidade() {
   const real = (FB_CONFIG && FB_CONFIG.projectId) || '';
@@ -1524,7 +1519,6 @@ function loadRota() {
     if (p.telefone) html += '<a href="' + telLink + '" target="_blank" class="stop-tel" style="text-decoration:none;display:inline-block">💬 ' + p.telefone + '</a>';
     html += '<div class="stop-addr">📍 ' + addrSafe;
     if (p.bairro) html += ' · ' + p.bairro;
-    if (p.cidade) html += ' · ' + p.cidade;
     html += '</div>';
     const wazeStopUrl = buildWazeUrl(p.lat, p.lng, p.embarque || p.endereco, p.cidade);
     html += '<div class="stop-nav-row">';
@@ -1593,7 +1587,7 @@ async function commIniciar(chave) {
 
     // Presenças + Férias combinados
     let _commFerias = [];
-    _commUnsubFer = onSnapshot(doc(db, 'redentor', 'ferias'), (snapF) => {
+    _commUnsubFer = onSnapshot(doc(db, CLIENTE_ID, 'ferias'), (snapF) => {
       const allF = (snapF.exists() && snapF.data().lista) ? snapF.data().lista : [];
       const hoje = hojeLocal();
       _commFerias = allF.filter(f => f.chave === chave && f.inicio <= hoje && f.fim >= hoje);
@@ -1601,7 +1595,7 @@ async function commIniciar(chave) {
       if (window._commUltimaPres) commRenderPresencas(window._commUltimaPres, _commFerias);
     });
 
-    _commUnsubPres = onSnapshot(doc(db, 'redentor', 'presencas'), (snap) => {
+    _commUnsubPres = onSnapshot(doc(db, CLIENTE_ID, 'presencas'), (snap) => {
       const all = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
       const mine = all.filter(p => p.chave === chave && p.rodada === rodada);
       window._commUltimaPres = mine;
@@ -1609,7 +1603,7 @@ async function commIniciar(chave) {
     });
 
     // Rastreador (status do meu compartilhamento)
-    _commUnsubTrack = onSnapshot(doc(db, 'redentor', 'rastreador'), (snap) => {
+    _commUnsubTrack = onSnapshot(doc(db, CLIENTE_ID, 'rastreador'), (snap) => {
       const all = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
       const meu = all.find(t => t.chave === chave && t.rodada === rodada);
       const el = document.getElementById('commLocalStatus');
@@ -1617,7 +1611,7 @@ async function commIniciar(chave) {
     });
 
     // Chat
-    _commUnsubChat = onSnapshot(doc(db, 'redentor', commChatDocId(chave)), (snap) => {
+    _commUnsubChat = onSnapshot(doc(db, CLIENTE_ID, commChatDocId(chave)), (snap) => {
       const msgs = (snap.exists() && snap.data().msgs) ? snap.data().msgs : [];
       if (_commChatAberto) commRenderChat(msgs);
       const badge = document.getElementById('commChatBadge');
@@ -1666,7 +1660,7 @@ async function commCompartilharLocal() {
   try {
     const db = await commGetDb();
     const { doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const ref = doc(db, 'redentor', 'rastreador');
+    const ref = doc(db, CLIENTE_ID, 'rastreador');
     const snap = await getDoc(ref);
     let lista = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     const chave = window._commChave, rodada = commRodada(window._commTurno);
@@ -1694,7 +1688,7 @@ async function commCarregarChatInicial() {
   try {
     const db = await commGetDb();
     const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const snap = await getDoc(doc(db, 'redentor', commChatDocId(window._commChave)));
+    const snap = await getDoc(doc(db, CLIENTE_ID, commChatDocId(window._commChave)));
     const msgs = (snap.exists() && snap.data().msgs) ? snap.data().msgs : [];
     commRenderChat(msgs);
   } catch(e) {}
@@ -1728,7 +1722,7 @@ async function commEnviar() {
   try {
     const db = await commGetDb();
     const { doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const ref = doc(db, 'redentor', commChatDocId(window._commChave));
+    const ref = doc(db, CLIENTE_ID, commChatDocId(window._commChave));
     const snap = await getDoc(ref);
     let msgs = (snap.exists() && snap.data().msgs) ? snap.data().msgs : [];
     const hora = String(new Date().getHours()).padStart(2,'0') + ':' + String(new Date().getMinutes()).padStart(2,'0');
@@ -1813,7 +1807,7 @@ async function commExtraLocal(rotaId) {
   try {
     const db = await commGetDb();
     const { doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const ref = doc(db, 'redentor', 'rastreador');
+    const ref = doc(db, CLIENTE_ID, 'rastreador');
     const snap = await getDoc(ref);
     let lista = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     const chave = 'extra_' + rotaId;
@@ -1841,7 +1835,7 @@ async function commExtraChat(rotaId, nomeRota) {
     const db = await commGetDb();
     const { doc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const docId = 'chat_extra_' + rotaId.replace(/[^a-zA-Z0-9_]/g,'');
-    _commExtraUnsub[rotaId] = onSnapshot(doc(db, 'redentor', docId), (snap) => {
+    _commExtraUnsub[rotaId] = onSnapshot(doc(db, CLIENTE_ID, docId), (snap) => {
       const msgs = (snap.exists() && snap.data().msgs) ? snap.data().msgs : [];
       const mbox = document.getElementById('commExtraMsgs-' + rotaId);
       if (!mbox) return;
@@ -1872,7 +1866,7 @@ async function commExtraEnviar(rotaId) {
     const db = await commGetDb();
     const { doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const docId = 'chat_extra_' + rotaId.replace(/[^a-zA-Z0-9_]/g,'');
-    const ref = doc(db, 'redentor', docId);
+    const ref = doc(db, CLIENTE_ID, docId);
     const snap = await getDoc(ref);
     let msgs = (snap.exists() && snap.data().msgs) ? snap.data().msgs : [];
     const hora = String(new Date().getHours()).padStart(2,'0') + ':' + String(new Date().getMinutes()).padStart(2,'0');
@@ -1886,7 +1880,7 @@ async function commCarregarHorariosDoDia(rotaId) {
   try {
     const db = await commGetDb();
     const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const snap = await getDoc(doc(db, 'redentor', 'horarios_do_dia'));
+    const snap = await getDoc(doc(db, CLIENTE_ID, 'horarios_do_dia'));
     const all = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     // só os da rodada vigente
     const rota = DATA.find(r => r.id === rotaId);
@@ -1909,7 +1903,7 @@ async function commCarregarMaps() {
   try {
     const db = await commGetDb();
     const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const snap = await getDoc(doc(db, 'redentor', 'config'));
+    const snap = await getDoc(doc(db, CLIENTE_ID, 'config'));
     if (snap.exists()) mapsKey = snap.data().mapsApiKey || '';
   } catch(e) {}
   if (!mapsKey) { alert('A chave do Google Maps não está configurada. Peça ao gestor para abrir o sistema (index), ir em Config e salvar a chave do Google Maps — ela é sincronizada automaticamente.'); return false; }
@@ -1952,11 +1946,11 @@ async function commRecalcular() {
     const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const hoje = hojeLocal();
     // não-vou de hoje
-    const sp = await getDoc(doc(db, 'redentor', 'presencas'));
+    const sp = await getDoc(doc(db, CLIENTE_ID, 'presencas'));
     const presList = (sp.exists() && sp.data().lista) ? sp.data().lista : [];
     presList.filter(p => p.chave === chave && p.rodada === rodada && !p.vai).forEach(p => ausentesTel.push((p.telefone||'').replace(/\D/g,'')));
     // férias vigentes
-    const sf = await getDoc(doc(db, 'redentor', 'ferias'));
+    const sf = await getDoc(doc(db, CLIENTE_ID, 'ferias'));
     const ferList = (sf.exists() && sf.data().lista) ? sf.data().lista : [];
     ferList.filter(f => f.chave === chave && f.inicio <= hoje && f.fim >= hoje).forEach(f => ausentesTel.push((f.telefone||'').replace(/\D/g,'')));
   } catch(e) {}
@@ -2067,7 +2061,7 @@ async function commPublicarRecalc() {
     const { doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const chave = window._commChave;
     const rodada = commRodada(window._commTurno);
-    const ref = doc(db, 'redentor', 'horarios_do_dia');
+    const ref = doc(db, CLIENTE_ID, 'horarios_do_dia');
     const snap = await getDoc(ref);
     let lista = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     lista = lista.filter(x => !x.rodada || x.rodada >= rodada);
@@ -2076,7 +2070,7 @@ async function commPublicarRecalc() {
     await setDoc(ref, { lista, updatedAt: new Date().toISOString() });
 
     const meuNome = document.getElementById('selMotorista').value || 'Motorista';
-    const refChat = doc(db, 'redentor', commChatDocId(chave));
+    const refChat = doc(db, CLIENTE_ID, commChatDocId(chave));
     const snapC = await getDoc(refChat);
     let msgs = (snapC.exists() && snapC.data().msgs) ? snapC.data().msgs : [];
     const hora = String(new Date().getHours()).padStart(2,'0')+':'+String(new Date().getMinutes()).padStart(2,'0');

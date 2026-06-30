@@ -1199,7 +1199,7 @@ function loadGoogleMaps(key) {
   <div class="header-stats">
     <div class="hstat"><div class="hstat-num" id="stat-func">200</div><div class="hstat-label">Ativos</div></div>
     <div class="hstat"><div class="hstat-num" id="stat-lines">7</div><div class="hstat-label">Linhas</div></div>
-    <div class="hstat"><div class="hstat-num">3</div><div class="hstat-label">Turnos</div></div>
+    <div class="hstat"><div class="hstat-num" id="stat-turnos">3</div><div class="hstat-label">Turnos</div></div>
     <div class="hstat"><div class="hstat-num" id="stat-rotas">17</div><div class="hstat-label">Rotas</div></div>
   </div>
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -1223,11 +1223,8 @@ function loadGoogleMaps(key) {
     <div class="search-wrap">
       <input class="search-input" type="text" placeholder="🔍  Nome, bairro, cidade ou ponto de embarque..." id="searchInput" oninput="filterSidebar()">
     </div>
-    <div class="turno-filter">
+    <div class="turno-filter" id="turnoFilterBar">
       <button class="turno-btn active" onclick="setTurnoFilter('todos', this)">Todos</button>
-      <button class="turno-btn" onclick="setTurnoFilter('1°', this)">1° Turno</button>
-      <button class="turno-btn" onclick="setTurnoFilter('2°', this)">2° Turno</button>
-      <button class="turno-btn" onclick="setTurnoFilter('3°', this)">3° Turno</button>
     </div>
     <div class="sidebar-label">STATUS</div>
     <div class="status-filter" id="statusFilter">
@@ -1534,22 +1531,8 @@ function loadGoogleMaps(key) {
         <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Selecione o tipo de atendimento necessário</div>
         <div style="display:flex;flex-direction:column;gap:8px" id="cliTipoLista">
 
-          <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:4px 0">Extras</div>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('extra_1turno','Extra — 1º Turno',this)">🚐 Extra — 1º Turno</button>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('extra_2turno','Extra — 2º Turno',this)">🚐 Extra — 2º Turno</button>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('extra_3turno','Extra — 3º Turno',this)">🚐 Extra — 3º Turno</button>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('van_l3','Van L3',this)">🚐 Van L3</button>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('van_l4','Van L4',this)">🚐 Van L4</button>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('van_l5','Van L5',this)">🚐 Van L5</button>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('van_l7','Van L7',this)">🚐 Van L7</button>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('vertiv','Vertiv',this)">🚐 Vertiv</button>
-
-          <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:8px 0 4px">Viagens</div>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('viagem_barueri','Viagem — Barueri',this)">🗺️ Viagem — Barueri</button>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('viagem_jundiai','Viagem — Jundiaí',this)">🗺️ Viagem — Jundiaí</button>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('viagem_cajamar','Viagem — Cajamar',this)">🗺️ Viagem — Cajamar</button>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('viagem_extrema','Viagem — Extrema',this)">🗺️ Viagem — Extrema</button>
-          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('viagem_salto','Viagem — Salto de Pirapora',this)">🗺️ Viagem — Salto de Pirapora</button>
+          <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:4px 0">Trechos Regionais</div>
+          <button class="cli-tipo-btn" onclick="cliSelecionarTipo('regional','Sorocaba/Votorantim ↔ EVAMO',this)">🚐 Sorocaba/Votorantim ↔ EVAMO</button>
 
           <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:8px 0 4px">Transfer Aeroportos</div>
           <button class="cli-tipo-btn" onclick="cliSelecionarTipo('transfer_viracopos','Transfer — Viracopos',this)">✈️ Transfer — Viracopos</button>
@@ -1673,11 +1656,8 @@ function loadGoogleMaps(key) {
     </div>
     <div style="flex-shrink:0;padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <!-- Turno filter -->
-      <div style="display:flex;gap:6px;align-items:center">
+      <div style="display:flex;gap:6px;align-items:center" id="mgTurnoBar">
         <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Turno:</span>
-        <button class="turno-btn active" id="mgTurno1" onclick="setMapaTurno('1°',this)">1° Turno</button>
-        <button class="turno-btn" id="mgTurno2" onclick="setMapaTurno('2°',this)">2° Turno</button>
-        <button class="turno-btn" id="mgTurno3" onclick="setMapaTurno('3°',this)">3° Turno</button>
       </div>
       <div style="width:1px;height:24px;background:var(--border)"></div>
       <!-- Line checkboxes -->
@@ -1913,6 +1893,7 @@ function updateStats() {
   const nRotas  = DATA.length;
   const elF = document.getElementById('stat-func');  if (elF) elF.textContent = ativos;
   const elL = document.getElementById('stat-lines'); if (elL) elL.textContent = nLinhas;
+  const elT = document.getElementById('stat-turnos'); if (elT) elT.textContent = new Set(DATA.map(r => r.turno).filter(Boolean)).size;
   const elR = document.getElementById('stat-rotas'); if (elR) elR.textContent = nRotas;
 }
 
@@ -1922,6 +1903,7 @@ function renderSidebar() {
   list.innerHTML = '';
 
   updateStats();
+  renderTurnoFilter();
 
   // Search mode: show matching passengers with Edit button
   if (q) {
@@ -2066,6 +2048,21 @@ function renderStatusList(q) {
 }
 
 function filterSidebar() { renderSidebar(); }
+
+function renderTurnoFilter() {
+  const bar = document.getElementById('turnoFilterBar');
+  if (!bar) return;
+  const ordem = {'1°':1,'2°':2,'3°':3,'ADM':4};
+  const presentes = [...new Set(DATA.filter(r => r.passageiros && r.passageiros.length).map(r => r.turno))]
+    .sort((a,b) => (ordem[a]||9) - (ordem[b]||9));
+  if (turnoFilter !== 'todos' && !presentes.includes(turnoFilter)) turnoFilter = 'todos';
+  let html = '<button class="turno-btn' + (turnoFilter==='todos'?' active':'') + '" onclick="setTurnoFilter(\'todos\', this)">Todos</button>';
+  presentes.forEach(t => {
+    const label = (t === 'ADM') ? 'ADM' : (t + ' Turno');
+    html += '<button class="turno-btn' + (turnoFilter===t?' active':'') + '" onclick="setTurnoFilter(\'' + t + '\', this)">' + label + '</button>';
+  });
+  bar.innerHTML = html;
+}
 
 function setTurnoFilter(t, btn) {
   turnoFilter = t;
@@ -3058,7 +3055,7 @@ function aplicarOtimizacao() {
 
 // ---- API KEY CONFIG ----
 // Chave Firebase (NÃO é Maps Key) — usada para detectar cache corrompido
-const FB_API_KEY = 'AIzaSyAuo4e7QEOR-Yqs-Im-dSkC9hOQ19pRmG4';
+const FB_API_KEY = 'AIzaSyBN1VE2mS5nn5LxfxWMqJyHSe1aDtwYiCE';
 let MAPS_API_KEY = '';
 
 // Helper: escapar caracteres especiais para injeção segura em HTML
@@ -3588,17 +3585,17 @@ function openPainel() {
   const totalAtivos = DATA.reduce((s, r) => s + r.passageiros.filter(p => p.status === 'ativo').length, 0);
   const totalFerias = DATA.reduce((s, r) => s + r.passageiros.filter(p => p.status === 'ferias').length, 0);
   const totalAfastado = DATA.reduce((s, r) => s + r.passageiros.filter(p => p.status === 'afastado').length, 0);
-  const t1 = DATA.reduce((s, r) => r.turno === '1°' ? s + r.passageiros.filter(p=>p.status==='ativo').length : s, 0);
-  const t2 = DATA.reduce((s, r) => r.turno === '2°' ? s + r.passageiros.filter(p=>p.status==='ativo').length : s, 0);
-  const t3 = DATA.reduce((s, r) => r.turno === '3°' ? s + r.passageiros.filter(p=>p.status==='ativo').length : s, 0);
+  const ordemTurnoP = {'1°':1,'2°':2,'3°':3,'ADM':4};
+  const turnosPresentesP = [...new Set(DATA.filter(r => r.passageiros && r.passageiros.length).map(r => r.turno))]
+    .sort((a,b) => (ordemTurnoP[a]||9) - (ordemTurnoP[b]||9));
+  const contagemTurnoP = {};
+  turnosPresentesP.forEach(t => { contagemTurnoP[t] = DATA.reduce((s, r) => r.turno === t ? s + r.passageiros.filter(p=>p.status==='ativo').length : s, 0); });
 
   const linhasUnicas = [...new Set(DATA.map(r => r.linha))].sort((a,b)=>a-b);
 
   let html = '<div class="report-summary" style="margin-bottom:20px">' +
     '<div class="report-stat"><div class="report-stat-num" style="color:var(--green)">' + totalAtivos + '</div><div class="report-stat-label">Ativos</div></div>' +
-    '<div class="report-stat"><div class="report-stat-num" style="color:var(--accent)">' + t1 + '</div><div class="report-stat-label">1° Turno</div></div>' +
-    '<div class="report-stat"><div class="report-stat-num" style="color:var(--accent)">' + t2 + '</div><div class="report-stat-label">2° Turno</div></div>' +
-    '<div class="report-stat"><div class="report-stat-num" style="color:var(--accent)">' + t3 + '</div><div class="report-stat-label">3° Turno</div></div>' +
+    turnosPresentesP.map(t => '<div class="report-stat"><div class="report-stat-num" style="color:var(--accent)">' + contagemTurnoP[t] + '</div><div class="report-stat-label">' + (t==='ADM'?'ADM':(t+' Turno')) + '</div></div>').join('') +
     '<div class="report-stat"><div class="report-stat-num" style="color:var(--accent2)">' + totalFerias + '</div><div class="report-stat-label">Férias</div></div>' +
     '<div class="report-stat"><div class="report-stat-num" style="color:var(--red)">' + totalAfastado + '</div><div class="report-stat-label">Afastados</div></div>' +
     '<div class="report-stat"><div class="report-stat-num" style="color:var(--muted)">' + DESLIGADOS.length + '</div><div class="report-stat-label">Desligados</div></div>' +
@@ -3643,24 +3640,19 @@ function openPainel() {
 }
 
 // ---- FIREBASE + LOCALSTORAGE PERSISTENCE ----
-const STORAGE_KEY = 'redentor_v1';
+const STORAGE_KEY = 'evamo_v1';
 const FB_CONFIG = {
-  apiKey: "AIzaSyAuo4e7QEOR-Yqs-Im-dSkC9hOQ19pRmG4",
-  authDomain: "redentor-transporte-11808.firebaseapp.com",
-  projectId: "redentor-transporte-11808",
-  storageBucket: "redentor-transporte-11808.firebasestorage.app",
-  messagingSenderId: "212228402135",
-  appId: "1:212228402135:web:af9ae2948f0fd1864ff992"
+  apiKey: "AIzaSyBN1VE2mS5nn5LxfxWMqJyHSe1aDtwYiCE",
+  authDomain: "evamo-transporte.firebaseapp.com",
+  projectId: "evamo-transporte",
+  storageBucket: "evamo-transporte.firebasestorage.app",
+  messagingSenderId: "84008575783",
+  appId: "1:84008575783:web:d56e4e2cdeed1438b87f02"
 };
 
-// ============================================================
 // TRAVA DE IDENTIDADE (proteção multi-cliente)
-// CLIENTE_ID = nome da coleção própria deste cliente no Firestore.
-// PROJETO_ESPERADO = projectId do Firebase que ESTE arquivo deve usar.
-// Se aberto no banco errado, bloqueia gravação e avisa.
-// ============================================================
-const CLIENTE_ID = 'redentor';
-const PROJETO_ESPERADO = 'redentor-transporte-11808';
+const CLIENTE_ID = 'evamo';
+const PROJETO_ESPERADO = 'evamo-transporte';
 let TRAVA_OK = true;
 function verificarIdentidade() {
   const real = (FB_CONFIG && FB_CONFIG.projectId) || '';
@@ -3787,38 +3779,17 @@ async function loadData() {
 
       if (snap.exists()) {
         const saved = snap.data();
-        if (saved.dataVersion === BASE_VERSION) {
-          const fbTime = new Date(saved.savedAt || 0).getTime();
-          const localTime = new Date(localSnap?.savedAt || 0).getTime();
-          const hasValidLocal = localSnap?.dataVersion === BASE_VERSION && localSnap?.DATA?.length > 0;
-
-          if (hasValidLocal && (localTime - fbTime) > 2000) {
-            // Local is newer - push to Firebase
-            applySnapshot(localSnap);
-            saveToFirebase(localSnap);
-            console.log('✅ Local aplicado e sincronizado:', localSnap.savedAt);
-          } else {
-            // Firebase is authoritative
-            applySnapshot(saved);
-            saveToLocal(saved);
-            console.log('✅ Firebase aplicado:', saved.savedAt);
-          }
+        // O cliente NUNCA sobrescreve o cadastro mestre. Apenas LÊ o Firebase.
+        // (Regras de segurança também bloqueiam escrita do cliente em 'dados'.)
+        if (saved.DATA && saved.DATA.length > 0) {
+          applySnapshot(saved);
+          saveToLocal(saved);
+          console.log('✅ Firebase aplicado (somente leitura):', saved.savedAt);
         } else {
-          // New version in HTML - overwrite Firebase
-          console.log('🔄 Nova versão! Atualizando Firebase...');
-          const newSnap = getSnapshot();
-          newSnap.dataVersion = BASE_VERSION;
-          await saveToFirebase(newSnap);
-          saveToLocal(newSnap);
-          console.log('✅ Firebase atualizado:', DATA.length, 'rotas');
+          console.log('ℹ️ Firebase sem dados ainda — nada a exibir.');
         }
       } else {
-        // No data in Firebase yet
-        const newSnap = getSnapshot();
-        newSnap.dataVersion = BASE_VERSION;
-        await saveToFirebase(newSnap);
-        saveToLocal(newSnap);
-        console.log('📤 Dados iniciais enviados ao Firebase');
+        console.log('ℹ️ Sem dados no Firebase ainda.');
       }
       return DATA.length > 0;
     } catch(e) {
@@ -3881,6 +3852,7 @@ async function openMapaGeral(rotaExtraIdx) {
   // 3. Se ainda não tem, mostrar input inline no próprio modal
   if (!key) {
     document.getElementById('modalMapaGeral').classList.add('open');
+  renderMapaTurnoBar();
     document.getElementById('mapaGeralDiv').innerHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;padding:24px">
         <div style="font-size:28px">🗝️</div>
@@ -3935,6 +3907,7 @@ async function saveInlineApiKey(rotaExtraIdx) {
 
 function _iniciarMapa(rotaExtraIdx) {
   document.getElementById('modalMapaGeral').classList.add('open');
+  renderMapaTurnoBar();
   buildLinhasCheck();
   ensureMapsLoaded().then(() => {
     initMapaGeral();
@@ -4007,6 +3980,21 @@ function mgSelectNone() {
   mgLinhasSel.clear();
   buildLinhasCheck();
   renderMapaGeral();
+}
+
+function renderMapaTurnoBar() {
+  const bar = document.getElementById('mgTurnoBar');
+  if (!bar) return;
+  const ordem = {'1°':1,'2°':2,'3°':3,'ADM':4};
+  const presentes = [...new Set(DATA.filter(r => r.passageiros && r.passageiros.length).map(r => r.turno))]
+    .sort((a,b) => (ordem[a]||9) - (ordem[b]||9));
+  if (!presentes.includes(mgTurno)) mgTurno = presentes[0] || '1°';
+  let html = '<span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Turno:</span>';
+  presentes.forEach(t => {
+    const label = (t === 'ADM') ? 'ADM' : (t + ' Turno');
+    html += '<button class="turno-btn' + (mgTurno===t?' active':'') + '" onclick="setMapaTurno(\'' + t + '\', this)">' + label + '</button>';
+  });
+  bar.innerHTML = html;
 }
 
 function setMapaTurno(t, btn) {
@@ -4567,7 +4555,7 @@ function exportBackup() {
 }
 
 // ---- CLIENTE AUTH ----
-const SENHA_CLIENTE = 'redentordsv';
+const SENHA_CLIENTE = 'evamo@26';
 
 function fazerLogin() {
   const val = document.getElementById('senhaCliente').value;
@@ -5079,12 +5067,12 @@ async function cliEnviarSolicitacao() {
       };
       // E-mail para o gestor Redentor
       console.log('Enviando e-mail para: redentorfretamento@gmail.com');
-      await emailjs.send('service_gp46qeg', 'template_m4k9byn', { origem:'DSV',
+      await emailjs.send('service_gp46qeg', 'template_m4k9byn', { origem:'Evamo',
         ...params, to_email: 'redentorfretamento@gmail.com'
       });
       // E-mail para o cliente (teste: borbacana@gmail.com)
       console.log('Enviando e-mail para: borbacana@gmail.com');
-      await emailjs.send('service_gp46qeg', 'template_m4k9byn', { origem:'DSV',
+      await emailjs.send('service_gp46qeg', 'template_m4k9byn', { origem:'Evamo',
         ...params, to_email: 'borbacana@gmail.com'
       });
     } catch(emailErr) {
@@ -5424,7 +5412,7 @@ async function cadEnviar() {
     if (!fbDb) await initFirebase();
     if (!fbDb) throw new Error('Firebase indisponível');
     const {getDoc,setDoc,doc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const ref=doc(fbDb,'redentor',CAD_FB_KEY);
+    const ref=doc(fbDb,CLIENTE_ID,CAD_FB_KEY);
     const snap=await getDoc(ref);
     const lista=(snap.exists()&&snap.data().lista)?snap.data().lista:[];
     const now=new Date();
@@ -5439,7 +5427,7 @@ async function cadEnviar() {
       emailjs.init('i8-o88nerwgYStDgL');
       const resumoTxt=cadMontarResumoTexto();
       for (const email of ['redentorfretamento@gmail.com','borbacana@gmail.com']) {
-        await emailjs.send('service_gp46qeg','template_m4k9byn',{ origem:'DSV',sol_id:id,tipo:CAD_TIPO_LABEL,data:now.toLocaleDateString('pt-BR'),horario:now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),roteiro:'—',funcionarios:resumoTxt,obs:obs||'—',to_email:email});
+        await emailjs.send('service_gp46qeg','template_m4k9byn',{ origem:'Evamo',sol_id:id,tipo:CAD_TIPO_LABEL,data:now.toLocaleDateString('pt-BR'),horario:now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),roteiro:'—',funcionarios:resumoTxt,obs:obs||'—',to_email:email});
       }
     } catch(e){console.warn('CAD email:',e);}
     const waTexto=encodeURIComponent('Solicitacao de Cadastro - Redentor Fretamento\n\nID: '+id+'\nTipo: '+CAD_TIPO_LABEL+'\n'+cadMontarResumoTexto()+(obs?'\n\nObs: '+obs:'')+'\n\nAguardo atendimento.');
@@ -5460,7 +5448,7 @@ async function cadCarregarHistorico() {
     if (!fbDb) await initFirebase();
     if (!fbDb) return;
     const {onSnapshot,doc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    onSnapshot(doc(fbDb,'redentor',CAD_FB_KEY),snap=>{
+    onSnapshot(doc(fbDb,CLIENTE_ID,CAD_FB_KEY),snap=>{
       CAD_SOL_DADOS=(snap.exists()&&snap.data().lista)?snap.data().lista:[];
       if (document.getElementById('cadAbaHistorico').style.display!=='none') cadRenderHistorico();
     });
@@ -5754,7 +5742,7 @@ async function rcRegistrar() {
     try {
       emailjs.init('i8-o88nerwgYStDgL');
       const alvo = reg.passageiro || (reg.chave ? 'Linha '+reg.chave.replace('_',' — ') : 'Geral');
-      await emailjs.send('service_gp46qeg','template_m4k9byn',{ origem:'DSV',
+      await emailjs.send('service_gp46qeg','template_m4k9byn',{ origem:'Evamo',
         sol_id: reg.id, tipo:'Reclamação Aberta', data: reg.dataOcorrencia.split('-').reverse().join('/'),
         horario: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}), roteiro: alvo + (reg.turno?' · '+reg.turno+' turno':''),
         funcionarios: reg.descricao, obs: reg.provas ? 'Provas: '+reg.provas : '—',
@@ -5808,7 +5796,7 @@ async function rcRecusar(id) {
     try {
       emailjs.init('i8-o88nerwgYStDgL');
       const alvo = r.passageiro || (r.chave ? 'Linha '+r.chave.replace('_',' — ') : 'Geral');
-      await emailjs.send('service_gp46qeg','template_m4k9byn',{ origem:'DSV',
+      await emailjs.send('service_gp46qeg','template_m4k9byn',{ origem:'Evamo',
         sol_id: r.id, tipo:'Reclamação Não resolvida', data: new Date().toLocaleDateString('pt-BR'),
         horario: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
         roteiro: alvo + (r.turno?' · '+r.turno+' turno':''),

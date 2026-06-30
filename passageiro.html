@@ -271,22 +271,17 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const FB_CONFIG = {
-  apiKey: "AIzaSyAuo4e7QEOR-Yqs-Im-dSkC9hOQ19pRmG4",
-  authDomain: "redentor-transporte-11808.firebaseapp.com",
-  projectId: "redentor-transporte-11808",
-  storageBucket: "redentor-transporte-11808.firebasestorage.app",
-  messagingSenderId: "212228402135",
-  appId: "1:212228402135:web:af9ae2948f0fd1864ff992"
+  apiKey: "AIzaSyBN1VE2mS5nn5LxfxWMqJyHSe1aDtwYiCE",
+  authDomain: "evamo-transporte.firebaseapp.com",
+  projectId: "evamo-transporte",
+  storageBucket: "evamo-transporte.firebasestorage.app",
+  messagingSenderId: "84008575783",
+  appId: "1:84008575783:web:d56e4e2cdeed1438b87f02"
 };
 
-// ============================================================
 // TRAVA DE IDENTIDADE (proteção multi-cliente)
-// CLIENTE_ID = nome da coleção própria deste cliente no Firestore.
-// PROJETO_ESPERADO = projectId do Firebase que ESTE arquivo deve usar.
-// Se aberto no banco errado, bloqueia gravação e avisa.
-// ============================================================
-const CLIENTE_ID = 'redentor';
-const PROJETO_ESPERADO = 'redentor-transporte-11808';
+const CLIENTE_ID = 'evamo';
+const PROJETO_ESPERADO = 'evamo-transporte';
 let TRAVA_OK = true;
 function verificarIdentidade() {
   const real = (FB_CONFIG && FB_CONFIG.projectId) || '';
@@ -301,9 +296,7 @@ function verificarIdentidade() {
 }
 
 
-if (!verificarIdentidade()) { throw new Error("Identidade nao confere"); }
-
-
+if (!verificarIdentidade()) { throw new Error('Identidade do cliente não confere — conexão bloqueada por segurança.'); }
 const fbApp = initializeApp(FB_CONFIG);
 const db = getFirestore(fbApp);
 
@@ -316,13 +309,13 @@ let temMsgNova = false, temAvisoNovo = false;
 let _ultimoHorarioNotif = null;
 let unsubChat = null, unsubPres = null, unsubAvisos = null, unsubTrack = null;
 let chatVisto = 0, avisosVisto = 0, viewAtual = 'inicio';
-const STORAGE_KEY = 'redentor_pass_tel';
+const STORAGE_KEY = 'evamo_pass_tel';
 
 init();
 
 async function init() {
   try {
-    const snap = await getDoc(doc(db, 'redentor', 'dados'));
+    const snap = await getDoc(doc(db, CLIENTE_ID, 'dados'));
     if (snap.exists()) {
       DATA = snap.data().DATA || [];
       MOTORISTAS = snap.data().MOTORISTAS || [];
@@ -331,7 +324,7 @@ async function init() {
 
   // Carregar rotas extras publicadas (do dia)
   try {
-    const snapR = await getDoc(doc(db, 'redentor', 'rotas_do_dia'));
+    const snapR = await getDoc(doc(db, CLIENTE_ID, 'rotas_do_dia'));
     if (snapR.exists()) ROTAS_DIA = snapR.data().lista || [];
   } catch(e) { console.warn('Erro ao carregar rotas do dia:', e); }
 
@@ -390,7 +383,7 @@ function vigiarRotaExtra(rotaId) {
   }, 60000);
   // 2) Conclusão pelo motorista: escuta rotas_do_dia em tempo real
   try {
-    const ref = doc(db, 'redentor', 'rotas_do_dia');
+    const ref = doc(db, CLIENTE_ID, 'rotas_do_dia');
     _unsubRotasDia = onSnapshot(ref, (snap) => {
       if (!snap.exists()) return;
       ROTAS_DIA = snap.data().lista || [];
@@ -679,7 +672,7 @@ async function verificarAvaliacaoHoje() {
   if (!card) return;
   // rota extra não tem avaliação por enquanto (poderia ter); manter para linha fixa
   try {
-    const ref = doc(db, 'redentor', 'avaliacoes');
+    const ref = doc(db, CLIENTE_ID, 'avaliacoes');
     const snap = await getDoc(ref);
     const lista = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     const hoje = hojeLocal();
@@ -701,7 +694,7 @@ window.enviarAvaliacao = async function() {
   const just = document.getElementById('avJustificativa').value.trim();
   if (avEstrelas <= 4 && !just) { alert('Para 4 estrelas ou menos, conte o que podemos melhorar.'); return; }
   try {
-    const ref = doc(db, 'redentor', 'avaliacoes');
+    const ref = doc(db, CLIENTE_ID, 'avaliacoes');
     const snap = await getDoc(ref);
     let lista = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     const hoje = hojeLocal();
@@ -728,7 +721,7 @@ window.enviarAvaliacao = async function() {
 
 // ---- HORÁRIO RECALCULADO DO DIA ----
 let unsubHorario = null;function escutarHorarioDia() {
-  const ref = doc(db, 'redentor', 'horarios_do_dia');
+  const ref = doc(db, CLIENTE_ID, 'horarios_do_dia');
   unsubHorario = onSnapshot(ref, (snap) => {
     const all = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     const rodada = rodadaAtual();
@@ -764,7 +757,7 @@ let unsubHorario = null;function escutarHorarioDia() {
   }, (err) => console.warn('horario:', err));
 }
 function escutarFerias() {
-  const ref = doc(db, 'redentor', 'ferias');
+  const ref = doc(db, CLIENTE_ID, 'ferias');
   unsubFerias = onSnapshot(ref, (snap) => {
     const all = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     const meuTel = soDigitos(PASSAGEIRO.telefone);
@@ -799,7 +792,7 @@ window.salvarFerias = async function() {
   if (!inicio || !fim) { alert('Informe as duas datas.'); return; }
   if (fim < inicio) { alert('A data de retorno deve ser depois do início.'); return; }
   try {
-    const ref = doc(db, 'redentor', 'ferias');
+    const ref = doc(db, CLIENTE_ID, 'ferias');
     const snap = await getDoc(ref);
     let lista = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     const meuTel = soDigitos(PASSAGEIRO.telefone);
@@ -814,7 +807,7 @@ window.salvarFerias = async function() {
 window.cancelarFerias = async function() {
   if (!confirm('Cancelar seu período de férias/afastamento?')) return;
   try {
-    const ref = doc(db, 'redentor', 'ferias');
+    const ref = doc(db, CLIENTE_ID, 'ferias');
     const snap = await getDoc(ref);
     let lista = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     const meuTel = soDigitos(PASSAGEIRO.telefone);
@@ -830,7 +823,7 @@ function fmtData(d) {
 }
 
 function escutarPresencas() {
-  const ref = doc(db, 'redentor', 'presencas');
+  const ref = doc(db, CLIENTE_ID, 'presencas');
   unsubPres = onSnapshot(ref, (snap) => {
     const all = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     const rodada = rodadaAtual();
@@ -860,7 +853,7 @@ window.marcarPresenca = async function(sentido) {
   document.getElementById('btnVolta').classList.toggle('on', sentido === 'volta');
   document.getElementById('btnNaoVou').classList.toggle('on', sentido === 'nao');
   try {
-    const ref = doc(db, 'redentor', 'presencas');
+    const ref = doc(db, CLIENTE_ID, 'presencas');
     const snap = await getDoc(ref);
     let lista = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     const rodada = rodadaAtual();
@@ -919,7 +912,7 @@ function senLabel(s){
 function chaveDoc() { return 'chat_' + CHAVE.replace('°','').replace(/[^a-zA-Z0-9_]/g,''); }
 
 function escutarChat() {
-  const ref = doc(db, 'redentor', chaveDoc());
+  const ref = doc(db, CLIENTE_ID, chaveDoc());
   unsubChat = onSnapshot(ref, (snap) => {
     const msgs = (snap.exists() && snap.data().msgs) ? snap.data().msgs : [];
     renderChat(msgs);
@@ -965,7 +958,7 @@ window.enviarMsg = async function() {
   if (!txt) return;
   inp.value = '';
   try {
-    const ref = doc(db, 'redentor', chaveDoc());
+    const ref = doc(db, CLIENTE_ID, chaveDoc());
     const snap = await getDoc(ref);
     let msgs = (snap.exists() && snap.data().msgs) ? snap.data().msgs : [];
     msgs.push({ tipo:'passageiro', autor: PASSAGEIRO.nome, tel: PASSAGEIRO.telefone, txt, hora: agora(), em: new Date().toISOString() });
@@ -978,7 +971,7 @@ window.enviarMsg = async function() {
 };
 
 function escutarAvisos() {
-  const ref = doc(db, 'redentor', 'avisos');
+  const ref = doc(db, CLIENTE_ID, 'avisos');
   unsubAvisos = onSnapshot(ref, (snap) => {
     const all = (snap.exists() && snap.data().lista) ? snap.data().lista : [];
     const meus = all.filter(a => !a.chave || a.chave === CHAVE).sort((x,y)=>(y.em||'').localeCompare(x.em||''));
